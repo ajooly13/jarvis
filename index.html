@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<title>جارفيس</title>
+<meta name="description" content="مساعد علي الشخصي بالعامية الفلسطينية">
+<meta name="theme-color" content="#070b14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="جارفيس">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&family=Rubik:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app" class="app">
+
+  <header class="top">
+    <button class="icon-btn" id="menuBtn" aria-label="القائمة" title="الذاكرة والإعدادات">☰</button>
+    <div class="brand">
+      <span class="brand-name">جارفيس</span>
+      <span class="brand-sub" id="brainLabel">عم يجهّز…</span>
+    </div>
+    <button class="icon-btn" id="speakerBtn" aria-pressed="true" aria-label="الصوت" title="قراءة الردود بصوت">🔊</button>
+  </header>
+
+  <main class="stage" id="stage">
+    <div class="orb-wrap" id="orbWrap" aria-hidden="true">
+      <div class="orb" id="orb"><div class="orb-core"></div></div>
+      <div class="orb-state" id="orbState">جاهز</div>
+    </div>
+
+    <section class="log" id="log" role="log" aria-live="polite"></section>
+    <div class="heard" id="heard" aria-live="polite"></div>
+    <div id="notice" class="notice" hidden></div>
+  </main>
+
+  <footer class="dock">
+    <div class="quick" id="quick">
+      <button class="q" data-q="صباح الخير، شو عندي اليوم؟">صباح الخير</button>
+      <button class="q" data-q="شو المهام المفتوحة؟">المهام</button>
+      <button class="q" data-q="بدي رد على زبونة سألت: " data-fill="1">رد على زبونة</button>
+      <button class="q" data-q="بدي مذكرة قانونية بالفصحى عن: " data-fill="1">مذكرة</button>
+      <button class="q" data-q="احفظ: " data-fill="1">احفظ</button>
+    </div>
+    <form class="composer" id="composer">
+      <button type="button" class="mic" id="micBtn" aria-label="احكي" title="اضغط واحكي">
+        <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="currentColor" d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11Z"/></svg>
+      </button>
+      <textarea id="input" rows="1" placeholder="اكتب أو اضغط الميكروفون…" aria-label="رسالتك"></textarea>
+      <button type="button" class="stop" id="stopBtn" hidden>وقّف</button>
+      <button type="submit" class="send" id="sendBtn" aria-label="ابعت">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M3 11.5 21 3l-8.5 18-2-7.5-7.5-2Z"/></svg>
+      </button>
+    </form>
+    <div class="hands-row">
+      <label class="switch"><input type="checkbox" id="handsFree"> <span>سماع دائم (قول "جارفيس" وبعدها طلبك)</span></label>
+    </div>
+  </footer>
+
+  <!-- الدرج الجانبي: الذاكرة، المهام، الإعدادات -->
+  <div class="scrim" id="scrim" hidden></div>
+  <aside class="drawer" id="drawer" aria-label="الذاكرة والإعدادات" hidden>
+    <div class="drawer-head">
+      <strong>جارفيس</strong>
+      <button class="icon-btn" id="closeDrawer" aria-label="سكّر">✕</button>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="tasks" role="tab">المهام</button>
+      <button class="tab" data-tab="memory" role="tab">الذاكرة</button>
+      <button class="tab" data-tab="brains" role="tab">العقول</button>
+      <button class="tab" data-tab="more" role="tab">أكثر</button>
+    </nav>
+
+    <section class="panel active" data-panel="tasks">
+      <ul class="list" id="taskList"></ul>
+      <p class="empty" id="taskEmpty">ما في مهام مفتوحة.</p>
+      <div class="addrow"><input id="taskIn" placeholder="مهمة جديدة…" aria-label="مهمة جديدة"><button id="taskAdd" aria-label="أضف">+</button></div>
+    </section>
+
+    <section class="panel" data-panel="memory">
+      <ul class="list" id="factList"></ul>
+      <p class="empty" id="factEmpty">الذاكرة فاضية. قول لجارفيس "احفظ…" أو أضف من هون.</p>
+      <div class="addrow"><input id="factIn" placeholder="معلومة بدك جارفيس يتذكرها…" aria-label="معلومة جديدة"><button id="factAdd" aria-label="أضف">+</button></div>
+      <h3>تعليمات ثابتة</h3>
+      <textarea id="extra" rows="3" placeholder="مثلاً: رسوم التوصيل 20 شيكل، الدفع عند الاستلام…" aria-label="تعليمات ثابتة"></textarea>
+    </section>
+
+    <section class="panel" data-panel="brains">
+      <p class="hint">جارفيس بيجرّب العقول بالترتيب: لو واحد خلص حده المجاني أو وقع، بينتقل للتالي لحاله. المفاتيح بتنحفظ بهالجهاز بس.</p>
+      <div class="brain" data-p="gemini">
+        <div class="brain-head"><label class="switch"><input type="checkbox" class="p-on" checked> <b>Google Gemini</b> <span class="free">مجاني</span></label><span class="p-status"></span></div>
+        <input class="p-key" type="password" placeholder="مفتاح Gemini (AIza…)" autocomplete="off" aria-label="مفتاح Gemini">
+        <div class="brain-foot"><a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">جيب مفتاح مجاني</a><button class="p-test">جرّب</button></div>
+      </div>
+      <div class="brain" data-p="groq">
+        <div class="brain-head"><label class="switch"><input type="checkbox" class="p-on" checked> <b>Groq</b> <span class="free">مجاني</span></label><span class="p-status"></span></div>
+        <input class="p-key" type="password" placeholder="مفتاح Groq (gsk_…)" autocomplete="off" aria-label="مفتاح Groq">
+        <div class="brain-foot"><a href="https://console.groq.com/keys" target="_blank" rel="noopener">جيب مفتاح مجاني</a><button class="p-test">جرّب</button></div>
+      </div>
+      <div class="brain" data-p="openrouter">
+        <div class="brain-head"><label class="switch"><input type="checkbox" class="p-on" checked> <b>OpenRouter</b> <span class="free">نماذج مجانية</span></label><span class="p-status"></span></div>
+        <input class="p-key" type="password" placeholder="مفتاح OpenRouter (sk-or-…)" autocomplete="off" aria-label="مفتاح OpenRouter">
+        <div class="brain-foot"><a href="https://openrouter.ai/keys" target="_blank" rel="noopener">جيب مفتاح مجاني</a><button class="p-test">جرّب</button></div>
+      </div>
+      <div class="brain" data-p="claude">
+        <div class="brain-head"><label class="switch"><input type="checkbox" class="p-on"> <b>Claude</b> <span class="paid">حسب الاستعمال</span></label><span class="p-status"></span></div>
+        <input class="p-key" type="password" placeholder="مفتاح Anthropic (sk-ant-…)" autocomplete="off" aria-label="مفتاح Claude">
+        <select class="p-model" aria-label="نموذج Claude">
+          <option value="claude-opus-5-5">Opus 5.5 (الأذكى)</option>
+          <option value="claude-sonnet-5-5">Sonnet 5.5</option>
+          <option value="claude-haiku-5-5">Haiku 5.5 (الأرخص)</option>
+        </select>
+        <div class="brain-foot"><a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">مفتاح (بدون اشتراك)</a><button class="p-test">جرّب</button></div>
+      </div>
+      <div class="brain" data-p="ollama">
+        <div class="brain-head"><label class="switch"><input type="checkbox" class="p-on"> <b>Ollama (على الكمبيوتر)</b> <span class="free">محلي</span></label><span class="p-status"></span></div>
+        <input class="p-key" type="text" placeholder="العنوان، مثلاً http://localhost:11434" autocomplete="off" aria-label="عنوان Ollama">
+        <input class="p-model-text" type="text" placeholder="اسم النموذج، مثلاً qwen2.5:7b" aria-label="نموذج Ollama">
+        <div class="brain-foot"><span class="hint">بدو تشغيل Ollama مع OLLAMA_ORIGINS=*</span><button class="p-test">جرّب</button></div>
+      </div>
+    </section>
+
+    <section class="panel" data-panel="more">
+      <h3>الصوت</h3>
+      <label class="field">لغة التعرّف <select id="sttLang"><option value="ar-PS">عربي (فلسطين)</option><option value="ar-JO">عربي (الأردن)</option><option value="ar-SA">عربي (السعودية)</option><option value="ar-EG">عربي (مصر)</option><option value="en-US">English</option></select></label>
+      <label class="field">صوت القراءة <select id="ttsVoice"></select></label>
+      <label class="field">سرعة القراءة <input type="range" id="ttsRate" min="0.7" max="1.4" step="0.05" value="1"></label>
+      <h3>نقل الذاكرة بين الأجهزة</h3>
+      <div class="row"><button id="exportBtn">انسخ نسخة</button><button id="importBtn">الصق نسخة</button></div>
+      <textarea id="importBox" rows="3" placeholder="الصق هون النسخة من الجهاز الثاني واضغط 'الصق نسخة' تاني" hidden></textarea>
+      <h3>المحادثة</h3>
+      <button id="clearChat" class="danger">امسح المحادثة</button>
+      <p class="hint" id="installHint"></p>
+      <p class="hint">النسخة 1.0 · كل شي محفوظ بهالجهاز، ولا إشي بيطلع لأي سيرفر غير شركة العقل اللي بتختارها.</p>
+    </section>
+  </aside>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
